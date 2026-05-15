@@ -26,4 +26,4 @@ COPY --from=web-build /app/web/dist/web/browser ./public
 ENV PORT=3000
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy || npx prisma db push && exec node dist/index.js"]
+CMD ["sh", "-c", "(npx prisma migrate deploy || npx prisma db push) && npx prisma db seed && exec node dist/index.js"]

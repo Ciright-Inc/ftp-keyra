@@ -17,7 +17,13 @@ async function main() {
   const adminHash = await bcrypt.hash('KeyraAdmin2026!', 12);
   await prisma.user.upsert({
     where: { email: 'admin@keyra.ie' },
-    update: { isAdmin: true, emailVerified: true, phoneVerified: true },
+    update: {
+      passwordHash: adminHash,
+      isAdmin: true,
+      emailVerified: true,
+      phoneVerified: true,
+      simVerified: true,
+    },
     create: {
       email: 'admin@keyra.ie',
       passwordHash: adminHash,
@@ -35,7 +41,13 @@ async function main() {
   const demoHash = await bcrypt.hash('DemoUser2026!', 12);
   await prisma.user.upsert({
     where: { email: 'demo@keyra.ie' },
-    update: { emailVerified: true, phoneVerified: true },
+    update: {
+      passwordHash: demoHash,
+      isAdmin: false,
+      emailVerified: true,
+      phoneVerified: true,
+      simVerified: true,
+    },
     create: {
       email: 'demo@keyra.ie',
       passwordHash: demoHash,
