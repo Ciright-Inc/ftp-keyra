@@ -1,0 +1,16 @@
+{
+  "name": "keyra-ftp",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix api && npm install --prefix web",
+    "dev": "npm run dev --prefix api",
+    "dev:api": "npm run dev --prefix api",
+    "dev:web": "npm start --prefix web",
+    "build": "npm run build --prefix web && npm run build --prefix api",
+    "db:push": "npm run db:push --prefix api",
+    "db:seed": "npm run db:seed --prefix api",
+    "start": "npm run start --prefix api",
+    "start:web": "npm run dev:web"
+  }
+}

@@ -1,0 +1,9 @@
+# Deploy from repo root using Dockerfile; container start runs Prisma + Node (see Dockerfile CMD).
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/health"
+restartPolicyType = "ON_FAILURE"
+numReplicas = 1

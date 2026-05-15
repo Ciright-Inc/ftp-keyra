@@ -1,0 +1,227 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  passwordHash    String?  @map("password_hash")
+  fullName        String   @map("full_name")
+  emailVerified   Boolean  @default(false) @map("email_verified")
+  phoneVerified   Boolean  @default(false) @map("phone_verified")
+  simVerified     Boolean  @default(false) @map("sim_verified")
+  deviceTrustScore Float   @default(0) @map("device_trust_score")
+  botRiskScore    Float    @default(100) @map("bot_risk_score")
+  trustScore      Float    @default(0) @map("trust_score")
+  isAdmin         Boolean  @default(false) @map("is_admin")
+  deviceId        String?  @map("device_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  participants CampaignParticipant[]
+  messages     BankMessage[]
+  auditEvents  AuditEvent[]
+
+  @@map("users")
+}
+
+model Country {
+  id                       String   @id @default(uuid())
+  countryCode              String   @unique @map("country_code")
+  countryName              String   @map("country_name")
+  region                   String?
+  continent                String?
+  currencyCode             String?  @map("currency_code")
+  primaryLanguage          String?  @map("primary_language")
+  secondaryLanguages       String[] @default([]) @map("secondary_languages")
+  flagUrl                  String?  @map("flag_url")
+  status                   String   @default("active")
+  bankCount                Int      @default(0) @map("bank_count")
+  participantCount         Int      @default(0) @map("participant_count")
+  messageCount             Int      @default(0) @map("message_count")
+  authenticationProjection BigInt?  @map("authentication_projection")
+  trustScore               Float    @default(0) @map("trust_score")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  banks Bank[]
+
+  @@map("countries")
+}
+
+model Bank {
+  id                            String   @id @default(uuid())
+  countryId                     String   @map("country_id")
+  countryCode                   String   @map("country_code")
+  bankName                      String   @map("bank_name")
+  bankSlug                      String   @map("bank_slug")
+  legalName                     String?  @map("legal_name")
+  websiteUrl                    String?  @map("website_url")
+  logoUrl                       String?  @map("logo_url")
+  hqCity                        String?  @map("hq_city")
+  hqState                       String?  @map("hq_state")
+  hqCountry                     String?  @map("hq_country")
+  assetRank                     Int?     @map("asset_rank")
+  estimatedCustomers            BigInt?  @map("estimated_customers")
+  estimatedDigitalUsers           BigInt?  @map("estimated_digital_users")
+  monthlyAuthPerUser            Float    @default(45) @map("monthly_auth_per_user")
+  annualAuthProjection          BigInt?  @map("annual_auth_projection")
+  authenticationFeeAssumption     Float    @default(0.001) @map("authentication_fee_assumption")
+  keyraRevenueSharePercent        Float    @default(0.40) @map("keyra_revenue_share_percent")
+  communityShareOfKeyraPercent    Float    @default(0.10) @map("community_share_of_keyra_percent")
+  communityTotalSharePercent      Float    @default(0.04) @map("community_total_share_percent")
+  estimatedAnnualUtilityRevenue   Float?   @map("estimated_annual_utility_revenue")
+  estimatedAnnualKeyraRevenue     Float?   @map("estimated_annual_keyra_revenue")
+  estimatedAnnualCommunityPool    Float?   @map("estimated_annual_community_pool")
+  primaryBankEmail              String?  @map("primary_bank_email")
+  securityEmail                 String?  @map("security_email")
+  fraudEmail                    String?  @map("fraud_email")
+  customerServiceEmail          String?  @map("customer_service_email")
+  executiveRelationsEmail       String?  @map("executive_relations_email")
+  complianceEmail               String?  @map("compliance_email")
+  verifiedEmailStatus           String   @default("pending") @map("verified_email_status")
+  bankAdoptionStatus            String   @default("not_started") @map("bank_adoption_status")
+  bankResponseStatus            String   @default("none") @map("bank_response_status")
+  messageCount                  Int      @default(0) @map("message_count")
+  participantCount              Int      @default(0) @map("participant_count")
+  remainingSpots                Int      @default(10000) @map("remaining_spots")
+  maxSpots                      Int      @default(10000) @map("max_spots")
+  pressureScore                 Float    @default(0) @map("pressure_score")
+  trustModernizationScore       Float    @default(0) @map("trust_modernization_score")
+  createdAt                     DateTime @default(now()) @map("created_at")
+  updatedAt                     DateTime @updatedAt @map("updated_at")
+
+  country      Country               @relation(fields: [countryId], references: [id])
+  participants CampaignParticipant[]
+  messages     BankMessage[]
+
+  @@unique([countryCode, bankSlug])
+  @@map("banks")
+}
+
+model CampaignParticipant {
+  id                     String    @id @default(uuid())
+  userId                 String    @map("user_id")
+  countryCode            String    @map("country_code")
+  bankId                 String    @map("bank_id")
+  bankSlug               String    @map("bank_slug")
+  participantNumber      Int       @map("participant_number")
+  globalParticipantNumber Int?     @map("global_participant_number")
+  positionLocked         Boolean   @default(true) @map("position_locked")
+  positionLockedAt       DateTime? @map("position_locked_at")
+  walletAddressOptional  String?   @map("wallet_address_optional")
+  blockchainReferenceOptional String? @map("blockchain_reference_optional")
+  participationStatus    String    @default("active") @map("participation_status")
+  trustScore             Float     @default(0) @map("trust_score")
+  identityVerified       Boolean   @default(false) @map("identity_verified")
+  emailVerified          Boolean   @default(false) @map("email_verified")
+  phoneVerified          Boolean   @default(false) @map("phone_verified")
+  simVerified            Boolean   @default(false) @map("sim_verified")
+  deviceVerified         Boolean   @default(false) @map("device_verified")
+  botRiskScore           Float     @default(0) @map("bot_risk_score")
+  abuseScore             Float     @default(0) @map("abuse_score")
+  messageSentCount       Int       @default(0) @map("message_sent_count")
+  lastMessageSentAt      DateTime? @map("last_message_sent_at")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  user     User          @relation(fields: [userId], references: [id])
+  bank     Bank          @relation(fields: [bankId], references: [id])
+  messages BankMessage[]
+
+  @@unique([userId, bankId])
+  @@unique([bankId, participantNumber])
+  @@map("campaign_participants")
+}
+
+model BankMessage {
+  id                      String    @id @default(uuid())
+  userId                  String    @map("user_id")
+  participantId           String    @map("participant_id")
+  bankId                  String    @map("bank_id")
+  countryCode             String    @map("country_code")
+  bankSlug                String    @map("bank_slug")
+  fromUserEmail           String    @map("from_user_email")
+  fromUserName            String    @map("from_user_name")
+  toBankEmail             String    @map("to_bank_email")
+  ccEmails                String[]  @default([]) @map("cc_emails")
+  bccInternalAuditEmail   String?   @map("bcc_internal_audit_email")
+  subject                 String
+  messageBody             String    @map("message_body") @db.Text
+  userModifiedMessage     Boolean   @default(false) @map("user_modified_message")
+  defaultTemplateVersion  String?   @map("default_template_version")
+  messageStatus           String    @default("pending") @map("message_status")
+  emailVerifiedBeforeSend Boolean   @default(false) @map("email_verified_before_send")
+  sessionSignature        String?   @map("session_signature")
+  deviceSignature         String?   @map("device_signature")
+  ipAddress               String?   @map("ip_address")
+  userAgent               String?   @map("user_agent")
+  botRiskScore            Float?    @map("bot_risk_score")
+  abuseFilterStatus       String    @default("passed") @map("abuse_filter_status")
+  sentAt                  DateTime? @map("sent_at")
+  deliveredAt             DateTime? @map("delivered_at")
+  bouncedAt               DateTime? @map("bounced_at")
+  bankResponseReceived    Boolean   @default(false) @map("bank_response_received")
+  bankResponseNotes       String?   @map("bank_response_notes") @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  user        User                @relation(fields: [userId], references: [id])
+  participant CampaignParticipant @relation(fields: [participantId], references: [id])
+  bank        Bank                @relation(fields: [bankId], references: [id])
+
+  @@map("bank_messages")
+}
+
+model MessageTemplate {
+  id                String   @id @default(uuid())
+  templateName      String   @map("template_name")
+  countryCode       String?  @map("country_code")
+  languageCode      String   @default("en") @map("language_code")
+  subject           String
+  body              String   @db.Text
+  active            Boolean  @default(true)
+  version           String   @default("1.0")
+  createdBy         String?  @map("created_by")
+  approvedBy        String?  @map("approved_by")
+  legalReviewStatus String   @default("approved") @map("legal_review_status")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("message_templates")
+}
+
+model AuditEvent {
+  id              String   @id @default(uuid())
+  userId          String?  @map("user_id")
+  eventType       String   @map("event_type")
+  entityType      String?  @map("entity_type")
+  entityId        String?  @map("entity_id")
+  countryCode     String?  @map("country_code")
+  bankId          String?  @map("bank_id")
+  ipAddress       String?  @map("ip_address")
+  userAgent       String?  @map("user_agent")
+  deviceId        String?  @map("device_id")
+  sessionId       String?  @map("session_id")
+  riskScore       Float?   @map("risk_score")
+  eventPayloadJson Json?   @map("event_payload_json")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([eventType])
+  @@index([userId])
+  @@map("audit_events")
+}
+
+model GlobalCounter {
+  name  String @id
+  value Int    @default(0)
+
+  @@map("global_counters")
+}
