@@ -20,6 +20,8 @@ COPY api/package*.json ./
 COPY api/prisma ./prisma
 RUN npm ci --omit=dev
 COPY --from=api-build /app/api/dist ./dist
+# prisma seed (tsx prisma/seed.ts) imports ../src/lib/economics.js -> economics.ts at runtime
+COPY --from=api-build /app/api/src/lib/economics.ts ./src/lib/economics.ts
 COPY --from=api-build /app/api/node_modules/.prisma ./node_modules/.prisma
 COPY --from=web-build /app/web/dist/web/browser ./public
 
